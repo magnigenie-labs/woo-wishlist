@@ -119,9 +119,9 @@ class wooWl {
 			wp_enqueue_script( 'woowl_admin', plugins_url( 'assets/js/admin-settings.js', WOOWL_FILE ), array( 'woowl-icon-picker' ) );
 			$icons_path = array( 'icons_path' => plugins_url( 'assets/icons/selection.json', WOOWL_FILE ) );
 			wp_localize_script( 'woowl_admin', 'woowl' , $icons_path );
-			wp_enqueue_style( 'woowl_icons', plugins_url( 'assets/icons/style.css', WOOWL_FILE ), '1.0' );
+			// wp_enqueue_style( 'woowl_icons', plugins_url( 'assets/icons/style.css', WOOWL_FILE ), '1.0' );
 
-			wp_enqueue_script( 'woowl-script',  plugins_url( 'assets/js/woowl.js', WOOWL_FILE ), array( 'jquery' ), '1.0.0', true );
+			// wp_enqueue_script( 'woowl-script',  plugins_url( 'assets/js/woowl.js', WOOWL_FILE ), array( 'jquery' ), '1.0.0', true );
 			wp_localize_script( 'woowl-script', 'woowl', array(
 				'ajaxurl'	=> admin_url( 'admin-ajax.php' ),
 				'cart_url'  => wc_get_cart_url(),
@@ -135,18 +135,19 @@ class wooWl {
 			));
 			
 			//owlcarousel js
-			wp_enqueue_script( 'owlcarousel-js', plugins_url( 'assets/js/owl.carousel.min.js', WOOWL_FILE ) , array( 'jquery' ), '1.0.0', true);
+			// wp_enqueue_script( 'owlcarousel-js', plugins_url( 'assets/js/owl.carousel.min.js', WOOWL_FILE ) , array( 'jquery' ), '1.0.0', true);
 
 			//owlcarousel css
-			wp_enqueue_style( 'owlcarousel-css', plugins_url( 'assets/css/owl.carousel.min.css', WOOWL_FILE ));
-			wp_enqueue_style( 'owlcarousel-theme-js', plugins_url( 'assets/css/owl.theme.default.min.css', WOOWL_FILE ) );
+			// wp_enqueue_style( 'owlcarousel-css', plugins_url( 'assets/css/owl.carousel.min.css', WOOWL_FILE ));
+			// wp_enqueue_style( 'owlcarousel-theme-js', plugins_url( 'assets/css/owl.theme.default.min.css', WOOWL_FILE ) );
 			
-			wp_enqueue_style( 'woowl-style', plugins_url( 'assets/css/woowl.css', WOOWL_FILE ) );
+			// wp_enqueue_style( 'woowl-style', plugins_url( 'assets/css/woowl.css', WOOWL_FILE ) );
 
 			if (is_user_logged_in()) {
 				$user_id = get_current_user_id();
 				$wishlist_id = (get_user_meta( $user_id, 'woowl_wishlist',true ));
-				$wishlist_id = array_filter($wishlist_id);
+				if(is_array($wishlist_id))
+					$wishlist_id = array_filter($wishlist_id);
 				$show_delete_all_btn = get_option('woowl_wishlist_add_remove_all_button');
 				$css = '';
 				if ($show_delete_all_btn == 'no' || empty($wishlist_id)) {
@@ -169,7 +170,8 @@ class wooWl {
 			$product_id = $_POST['product_id'];
 			$user_id = get_current_user_id();
 			$wishlist_id = get_user_meta( $user_id, 'woowl_wishlist',true );
-			$show_add_to_cart_button = get_option('woowl_wishlist_show_add_to_button');
+			if(is_array($wishlist_id))
+				$show_add_to_cart_button = get_option('woowl_wishlist_show_add_to_button');
 			$add_to_cart_fixed_icon_text = get_option('woowl_add_to_cart_fixed_icon_text');
 			$wish = array($product_id);
 			$product = wc_get_product( $product_id );
@@ -345,15 +347,17 @@ class wooWl {
 				if (is_user_logged_in()) {
 						$user_id = get_current_user_id();
 						$wishlist_id = get_user_meta( $user_id, 'woowl_wishlist',true );
-						if (!empty($wishlist_id) && in_array($product->id, $wishlist_id)) {
-							$color = 'color:'.$wishlist_icon_color_active.'; ';
-							$wishlist_add_text = get_option('woowl_wishlist_product_added');
-							$add_to_wishlist_text_after_cart = $wishlist_add_text;
-						}else{
-							$color = 'color:'.$wishlist_icon_color_inactive.'; ';
-						}
+
+						if(is_array($wishlist_id))
+							if (!empty($wishlist_id) && in_array($product->id, $wishlist_id)) {
+								$color = 'color:'.$wishlist_icon_color_active.'; ';
+								$wishlist_add_text = get_option('woowl_wishlist_product_added');
+								$add_to_wishlist_text_after_cart = $wishlist_add_text;
+							}else{
+								$color = 'color:'.$wishlist_icon_color_inactive.'; ';
+							}
 					echo '<div class="wish_icon_after_cart">';
-					echo '<a class = "add_to_wishlist_text_after_cart" id = "'.$product->id.'" style="'.$color.';" >'.$add_to_wishlist_text_after_cart.'</a>';
+					echo '<a class = "add_to_wishlist_text_after_cart" href="" id = "'.$product->id.'" style="" >'.$add_to_wishlist_text_after_cart.'</a>';
 					echo '</div>';
 				}else{
 					$color = 'color:'.$wishlist_icon_color_inactive.'; ';
@@ -414,7 +418,8 @@ class wooWl {
 		if (is_user_logged_in()) {
 			$user_id = get_current_user_id();
 			$wishlist_id = (get_user_meta( $user_id, 'woowl_wishlist',true ));
-			$wishlist_id = array_filter($wishlist_id);
+			if(is_array( $wishlist_id ) )
+				$wishlist_id = array_filter($wishlist_id);
 			$show_delete_all_btn = get_option('woowl_wishlist_add_remove_all_button');
 			$wishlist_title = get_option('woowl_wishlist_title');
 			$show_price = get_option('woowl_wishlist_show_checkbox');
@@ -439,7 +444,7 @@ class wooWl {
 		    		<div class="wishlist_contain">
 		    			<div class="wishlist_heading">
 		    			<?php echo $wishlist_title." - "; ?>
-		    			<span class="wishlist_count"> <?php echo "( ".count($wishlist_id)." )"; ?> </span>
+		    			<span class="wishlist_count"> <?php echo is_countable($wishlist_id) ? count($wishlist_id): 0; ?> </span>
 		    			</div>
 		    			<?php
 		    				if ($show_delete_all_btn == 'yes') {
@@ -573,7 +578,8 @@ class wooWl {
 			$wishlist_title = get_option('woowl_wishlist_title');
 			$user_id = get_current_user_id();
 			$wishlist_id = (get_user_meta( $user_id, 'woowl_wishlist', true ));
-			$wishlist_id = array_filter($wishlist_id);
+			if( is_array($wishlist_id))
+				$wishlist_id = array_filter($wishlist_id);
 			$show_add_to_cart_button = get_option('woowl_wishlist_show_add_to_button');
 			$add_to_cart_fixed_icon_text = get_option('woowl_add_to_cart_fixed_icon_text');
 			$no_item_found_text = get_option('woowl_fixed_box_on_item_text');
